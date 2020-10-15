@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-10-12T09:27:16.180Z</updated>
+    <updated>2020-10-15T08:26:13.254Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,138 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[Python SFM(状态机)轮子：transitions 学习]]></title>
+        <id>https://kioipp.cn/post/python-sfmzhuang-tai-ji-lun-zi-transitions-xue-xi/</id>
+        <link href="https://kioipp.cn/post/python-sfmzhuang-tai-ji-lun-zi-transitions-xue-xi/">
+        </link>
+        <updated>2020-10-15T07:43:20.000Z</updated>
+        <content type="html"><![CDATA[<p>从同事写的一个工具里发现了这个库，能适用很多需要状态管理的场景，作者写的 Code Samples 更有意思。特此记录并写下学习这个库时候的心得。</p>
+<h2 id="蝙蝠侠快速示范">蝙蝠侠快速示范</h2>
+<pre><code class="language-python">from transitions import Machine
+import random
+
+class NarcolepticSuperhero(object):
+
+    # Define some states. Most of the time, narcoleptic superheroes are just like
+    # everyone else. Except for...
+    &quot;&quot;&quot;定义一个超级英雄的日常行为状态
+    &quot;&quot;&quot;
+    states = ['asleep', 'hanging out', 'hungry', 'sweaty', 'saving the world']
+
+    def __init__(self, name):
+
+        # No anonymous superheroes on my watch! Every narcoleptic superhero gets
+        # a name. Any name at all. SleepyMan. SlumberGirl. You get the idea.
+        ## 哪怕是叫小强，超级英雄也是需要一个响亮的名字
+        self.name = name
+
+        # What have we accomplished today?
+        ## 超级英雄日常拯救小猫任务计数 0/999999
+        self.kittens_rescued = 0
+
+        # Initialize the state machine
+        ## 超级英雄的一天从睡觉开始（雾
+        self.machine = Machine(model=self, states=NarcolepticSuperhero.states, initial='asleep')
+
+        # Add some transitions. We could also define these using a static list of
+        # dictionaries, as we did with states above, and then pass the list to
+        # the Machine initializer as the transitions= argument.
+
+        ## 给超级英雄添加一系列任务，这样就能让超级英雄从起床刷牙到拯救地球了
+        # At some point, every superhero must rise and shine.
+        self.machine.add_transition(trigger='wake_up', source='asleep', dest='hanging out')
+
+        # Superheroes need to keep in shape.
+        self.machine.add_transition('work_out', 'hanging out', 'hungry')
+
+        # Those calories won't replenish themselves!
+        self.machine.add_transition('eat', 'hungry', 'hanging out')
+
+        # Superheroes are always on call. ALWAYS. But they're not always
+        # dressed in work-appropriate clothing.
+
+        ## 超级英雄可以从任何时候进行拯救世界状态，但需要先穿上赞助商定制战衣～
+        self.machine.add_transition('distress_call', '*', 'saving the world',
+                         before='change_into_super_secret_costume')
+
+        # When they get off work, they're all sweaty and disgusting. But before
+        # they do anything else, they have to meticulously log their latest
+        # escapades. Because the legal department says so.
+        ## 在完成任务后，主机会自动给超级英雄记上一笔小红花
+        self.machine.add_transition('complete_mission', 'saving the world', 'sweaty',
+                         after='update_journal')
+
+        # Sweat is a disorder that can be remedied with water.
+        # Unless you've had a particularly long day, in which case... bed time!
+        ## 入睡前必须洗澡，除非超级英雄今天压根就没出门……（即使这样也要洗澡的吧喂！难道超级英雄是北方人吗？
+        self.machine.add_transition('clean_up', 'sweaty', 'asleep', conditions=['is_exhausted'])
+        self.machine.add_transition('clean_up', 'sweaty', 'hanging out')
+
+        # Our NarcolepticSuperhero can fall asleep at pretty much any time.
+        ## 没错！超级英雄任何时候都能入睡！
+        self.machine.add_transition('nap', '*', 'asleep')
+
+    def update_journal(self):
+        &quot;&quot;&quot; Dear Diary, today I saved Mr. Whiskers. Again. &quot;&quot;&quot;
+        self.kittens_rescued += 1
+
+    @property
+    def is_exhausted(self):
+        &quot;&quot;&quot; Basically a coin toss. &quot;&quot;&quot;
+        return random.random() &lt; 0.5
+
+    def change_into_super_secret_costume(self):
+        print(&quot;Beauty, eh?&quot;)
+
+</code></pre>
+<p>下面我们有请蝙蝠侠进行超级英雄示范 👏</p>
+<pre><code class="language-bash">&gt;&gt;&gt; batman = NarcolepticSuperhero(&quot;Batman&quot;)
+&gt;&gt;&gt; batman.state
+'asleep'
+
+&gt;&gt;&gt; batman.wake_up()
+&gt;&gt;&gt; batman.state
+'hanging out'
+
+&gt;&gt;&gt; batman.nap()
+&gt;&gt;&gt; batman.state
+'asleep'
+
+&gt;&gt;&gt; batman.clean_up()
+MachineError: &quot;Can't trigger event clean_up from state asleep!&quot;
+
+&gt;&gt;&gt; batman.wake_up()
+&gt;&gt;&gt; batman.work_out()
+&gt;&gt;&gt; batman.state
+'hungry'
+
+# Batman still hasn't done anything useful...
+&gt;&gt;&gt; batman.kittens_rescued
+0
+
+# We now take you live to the scene of a horrific kitten entreement...
+&gt;&gt;&gt; batman.distress_call()
+'Beauty, eh?'
+&gt;&gt;&gt; batman.state
+'saving the world'
+
+# Back to the crib.
+&gt;&gt;&gt; batman.complete_mission()
+&gt;&gt;&gt; batman.state
+'sweaty'
+
+&gt;&gt;&gt; batman.clean_up()
+&gt;&gt;&gt; batman.state
+'asleep'   # Too tired to shower!
+
+# Another productive day, Alfred.
+&gt;&gt;&gt; batman.kittens_rescued
+1
+</code></pre>
+<p>TOBE Continued .</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[2020.10.12]]></title>
         <id>https://kioipp.cn/post/20201012/</id>
