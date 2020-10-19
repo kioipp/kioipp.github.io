@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>manage.py: 简明好用的 CLI builder | 自留地</title>
-<link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1603080093001">
+<link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1603080555006">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://kioipp.cn/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="manage.py: 简明好用的 CLI builder | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
@@ -20,7 +20,9 @@
 </script>
 
 
-    <meta name="description" content="PIP 官方项目地址
+    <meta name="description" content="&quot;CLI is everything.&quot;
+
+PIP 官方项目地址
 
 https://pypi.org/project/manage.py/  （含官方用例）
 
@@ -28,8 +30,7 @@ https://pypi.org/project/manage.py/  （含官方用例）
 pip install mange.py
 
 使用
-1.创建命令
-from manager import Manager..." />
+1...." />
     <meta name="keywords" content="Python" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -39,7 +40,7 @@ from manager import Manager..." />
       <div class="main-content">
         <div class="site-header">
   <a href="https://kioipp.cn">
-  <img class="avatar" src="https://kioipp.cn/images/avatar.png?v=1603080093001" alt="">
+  <img class="avatar" src="https://kioipp.cn/images/avatar.png?v=1603080555006" alt="">
   </a>
   <h1 class="site-title">
     自留地
@@ -118,7 +119,9 @@ from manager import Manager..." />
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <h2 id="pip-官方项目地址">PIP 官方项目地址</h2>
+                <p>&quot;CLI is everything.&quot;</p>
+<!-- more -->
+<h2 id="pip-官方项目地址">PIP 官方项目地址</h2>
 <blockquote>
 <p>https://pypi.org/project/manage.py/  （含官方用例）</p>
 </blockquote>
@@ -142,7 +145,6 @@ def echo_with_no_args():
 if __name__ == '__main__':
     manager_echo.main()
 </code></pre>
-<hr>
 <pre><code class="language-bash">$ python3 cli_sample.py
 usage: cli_sample.py &lt;command&gt; [&lt;args&gt;]
 
@@ -155,10 +157,10 @@ optional arguments:
 available commands:
   echo_with_no_args        Command description, will show on command line.
 </code></pre>
-<hr>
 <pre><code class="language-bash">$ python3 cli_sample.py echo_with_no_args
 Hello
 </code></pre>
+<hr>
 <h3 id="2-多重-namepspace-管理">2. 多重 namepspace 管理</h3>
 <pre><code class="language-python">from manager import Manager
 import time
@@ -191,7 +193,6 @@ manager_main.merge(manager_ops, namespace='ops')
 if __name__ == '__main__':
     manager_main.main()
 </code></pre>
-<hr>
 <pre><code class="language-bash">python3 cli_sample.py
 usage: cli_sample.py [&lt;namespace&gt;.]&lt;command&gt; [&lt;args&gt;]
 
@@ -210,10 +211,10 @@ available commands:
   [ops]
     ops_with_no_args       Do some operation without args.
 </code></pre>
-<hr>
 <pre><code class="language-bash">python3 cli_sample.py ops.ops_with_no_args
 1603078473.9244218
 </code></pre>
+<hr>
 <h3 id="3不带提示-按照顺序输入的参数">3.不带提示、按照顺序输入的参数</h3>
 <pre><code class="language-python">@manager_echo.command
 def echo_with_args(name, pid):
@@ -221,10 +222,10 @@ def echo_with_args(name, pid):
     &quot;&quot;&quot;
     print(f'Name is {name}, PID is {pid}')
 </code></pre>
-<hr>
 <pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args  test 77
 Name is test, PID is 77
 </code></pre>
+<hr>
 <h3 id="4带提示的顺序输入的参数">4.带提示的顺序输入的参数</h3>
 <pre><code class="language-python">@manager_echo.arg('name', help='User\'s name')
 @manager_echo.arg('pid', help='App\'s PID')
@@ -234,7 +235,6 @@ def echo_with_args(name, pid):
     &quot;&quot;&quot;
     print(f'Name is {name}, PID is {pid}')
 </code></pre>
-<hr>
 <pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args -h
 usage: cli_sample.py echo.echo_with_args [-h] name pid
 
@@ -247,6 +247,7 @@ positional arguments:
 optional arguments:
   -h, --help  show this help message and exit
 </code></pre>
+<hr>
 <h3 id="5-必要参数和非必要参数的提示输入">5. 必要参数和非必要参数的提示输入</h3>
 <pre><code class="language-python">@manager_echo.arg('name', help='User\'s name')
 @manager_echo.arg('pid', help='App\'s PID')
@@ -256,7 +257,6 @@ def echo_with_args(name, pid=''):
     &quot;&quot;&quot;
     print(f'Name is {name}, PID is {pid}')
 </code></pre>
-<hr>
 <pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args -h
 usage: cli_sample.py echo.echo_with_args [-h] [--name NAME] [--pid PID]
 
@@ -267,12 +267,12 @@ optional arguments:
   --name NAME  User's name
   --pid PID    App's PID
 </code></pre>
-<hr>
 <pre><code class="language-bash">$ temp python3 cli_sample.py echo.echo_with_args 123
 Name is 123, PID is
 $ temp python3 cli_sample.py echo.echo_with_args 123 --pid 777
 Name is 123, PID is 777
 </code></pre>
+<hr>
 <p>或者作为布尔值使用：</p>
 <pre><code class="language-python">@manager_echo.arg('name', help='User\'s name')
 @manager_echo.arg('pid', help='App\'s PID')
@@ -291,7 +291,8 @@ Name is batman, PID not exists
 $ python3 cli_sample.py echo.echo_with_args batman --pid
 Name is batman, PID exists
 </code></pre>
-<h3 id="6参数-shorcuts">6.参数 shorcuts</h3>
+<hr>
+<h3 id="6参数-shortcuts">6.参数 shortcuts</h3>
 <pre><code class="language-python">@manager_echo.arg('name', shortcut='n', help='User\'s name')
 @manager_echo.arg('pid', shortcut='p', help='App\'s PID')
 @manager_echo.command
@@ -322,7 +323,7 @@ Name is batman, PID exists
 <li><a href="#3%E4%B8%8D%E5%B8%A6%E6%8F%90%E7%A4%BA-%E6%8C%89%E7%85%A7%E9%A1%BA%E5%BA%8F%E8%BE%93%E5%85%A5%E7%9A%84%E5%8F%82%E6%95%B0">3.不带提示、按照顺序输入的参数</a></li>
 <li><a href="#4%E5%B8%A6%E6%8F%90%E7%A4%BA%E7%9A%84%E9%A1%BA%E5%BA%8F%E8%BE%93%E5%85%A5%E7%9A%84%E5%8F%82%E6%95%B0">4.带提示的顺序输入的参数</a></li>
 <li><a href="#5-%E5%BF%85%E8%A6%81%E5%8F%82%E6%95%B0%E5%92%8C%E9%9D%9E%E5%BF%85%E8%A6%81%E5%8F%82%E6%95%B0%E7%9A%84%E6%8F%90%E7%A4%BA%E8%BE%93%E5%85%A5">5. 必要参数和非必要参数的提示输入</a></li>
-<li><a href="#6%E5%8F%82%E6%95%B0-shorcuts">6.参数 shorcuts</a></li>
+<li><a href="#6%E5%8F%82%E6%95%B0-shortcuts">6.参数 shortcuts</a></li>
 </ul>
 </li>
 </ul>
