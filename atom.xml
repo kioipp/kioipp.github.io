@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-10-15T09:34:42.447Z</updated>
+    <updated>2020-10-19T04:01:35.601Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,203 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[manage.py: 简明好用的 CLI builder]]></title>
+        <id>https://kioipp.cn/post/managepy-jian-ming-hao-yong-de-cli-builder/</id>
+        <link href="https://kioipp.cn/post/managepy-jian-ming-hao-yong-de-cli-builder/">
+        </link>
+        <updated>2020-10-19T03:16:05.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="pip-官方项目地址">PIP 官方项目地址</h2>
+<blockquote>
+<p>https://pypi.org/project/manage.py/  （含官方用例）</p>
+</blockquote>
+<h2 id="安装">安装</h2>
+<pre><code class="language-bash">pip install mange.py
+</code></pre>
+<h2 id="使用">使用</h2>
+<h3 id="1创建命令">1.创建命令</h3>
+<pre><code class="language-python">from manager import Manager
+
+manager_echo = Manager()
+
+
+@manager_echo.command
+def echo_with_no_args():
+    &quot;&quot;&quot;Command description, will show on command line.
+    &quot;&quot;&quot;
+    print(&quot;Hello&quot;)
+
+
+if __name__ == '__main__':
+    manager_echo.main()
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py
+usage: cli_sample.py &lt;command&gt; [&lt;args&gt;]
+
+positional arguments:
+  command     the command to run
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+available commands:
+  echo_with_no_args        Command description, will show on command line.
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py echo_with_no_args
+Hello
+</code></pre>
+<h3 id="2-多重-namepspace-管理">2. 多重 namepspace 管理</h3>
+<pre><code class="language-python">from manager import Manager
+import time
+
+manager_echo = Manager()
+manager_ops = Manager()
+manager_main = Manager()
+
+manager_main.merge(manager_echo, namespace='echo')
+manager_main.merge(manager_ops, namespace='ops')
+
+
+@manager_echo.command
+def echo_with_no_args():
+    &quot;&quot;&quot;Command description, will show on command line.
+    &quot;&quot;&quot;
+    print(&quot;Hello&quot;)
+
+
+@manager_ops.command
+def ops_with_no_args():
+    &quot;&quot;&quot;Do some operation without args.
+    &quot;&quot;&quot;
+    print(time.time() + 1.0)
+
+
+manager_main.merge(manager_echo, namespace='echo')
+manager_main.merge(manager_ops, namespace='ops')
+
+if __name__ == '__main__':
+    manager_main.main()
+</code></pre>
+<hr>
+<pre><code class="language-bash">python3 cli_sample.py
+usage: cli_sample.py [&lt;namespace&gt;.]&lt;command&gt; [&lt;args&gt;]
+
+positional arguments:
+  command     the command to run
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+available commands:
+
+  [echo]
+    echo_with_no_args      Command description, will show on command line.
+
+
+  [ops]
+    ops_with_no_args       Do some operation without args.
+</code></pre>
+<hr>
+<pre><code class="language-bash">python3 cli_sample.py ops.ops_with_no_args
+1603078473.9244218
+</code></pre>
+<h3 id="3不带提示-按照顺序输入的参数">3.不带提示、按照顺序输入的参数</h3>
+<pre><code class="language-python">@manager_echo.command
+def echo_with_args(name, pid):
+    &quot;&quot;&quot;Echo given &lt;params&gt;
+    &quot;&quot;&quot;
+    print(f'Name is {name}, PID is {pid}')
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args  test 77
+Name is test, PID is 77
+</code></pre>
+<h3 id="4带提示的顺序输入的参数">4.带提示的顺序输入的参数</h3>
+<pre><code class="language-python">@manager_echo.arg('name', help='User\'s name')
+@manager_echo.arg('pid', help='App\'s PID')
+@manager_echo.command
+def echo_with_args(name, pid):
+    &quot;&quot;&quot;Echo given &lt;params&gt;
+    &quot;&quot;&quot;
+    print(f'Name is {name}, PID is {pid}')
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args -h
+usage: cli_sample.py echo.echo_with_args [-h] name pid
+
+Echo given &lt;params&gt;
+
+positional arguments:
+  name        User's name
+  pid         App's PID
+
+optional arguments:
+  -h, --help  show this help message and exit
+</code></pre>
+<h3 id="5-必要参数和非必要参数的提示输入">5. 必要参数和非必要参数的提示输入</h3>
+<pre><code class="language-python">@manager_echo.arg('name', help='User\'s name')
+@manager_echo.arg('pid', help='App\'s PID')
+@manager_echo.command
+def echo_with_args(name, pid=''):
+    &quot;&quot;&quot;Echo given &lt;params&gt;
+    &quot;&quot;&quot;
+    print(f'Name is {name}, PID is {pid}')
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args -h
+usage: cli_sample.py echo.echo_with_args [-h] [--name NAME] [--pid PID]
+
+Echo given &lt;params&gt;
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --name NAME  User's name
+  --pid PID    App's PID
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ temp python3 cli_sample.py echo.echo_with_args 123
+Name is 123, PID is
+$ temp python3 cli_sample.py echo.echo_with_args 123 --pid 777
+Name is 123, PID is 777
+</code></pre>
+<p>或者作为布尔值使用：</p>
+<pre><code class="language-python">@manager_echo.arg('name', help='User\'s name')
+@manager_echo.arg('pid', help='App\'s PID')
+@manager_echo.command
+def echo_with_args(name, pid=False):
+    &quot;&quot;&quot;Echo given &lt;params&gt;
+    &quot;&quot;&quot;
+    if pid:
+        print(f'Name is {name}, PID exists')
+    else:
+        print(f'Name is {name}, PID not exists')
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args batman
+Name is batman, PID not exists
+$ python3 cli_sample.py echo.echo_with_args batman --pid
+Name is batman, PID exists
+</code></pre>
+<h3 id="6参数-shorcuts">6.参数 shorcuts</h3>
+<pre><code class="language-python">@manager_echo.arg('name', shortcut='n', help='User\'s name')
+@manager_echo.arg('pid', shortcut='p', help='App\'s PID')
+@manager_echo.command
+def echo_with_args(name, pid=False):
+    &quot;&quot;&quot;Echo given &lt;params&gt;
+    &quot;&quot;&quot;
+    if pid:
+        print(f'Name is {name}, PID exists')
+    else:
+        print(f'Name is {name}, PID not exists')
+</code></pre>
+<hr>
+<pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args batman --p
+Name is batman, PID exists
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[SFM(状态机)轮子：transitions 学习]]></title>
         <id>https://kioipp.cn/post/python-sfmzhuang-tai-ji-lun-zi-transitions-xue-xi/</id>
