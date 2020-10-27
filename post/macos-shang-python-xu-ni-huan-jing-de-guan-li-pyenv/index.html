@@ -2,11 +2,11 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Python实例方法、类方法和静态方法举例理解 | 自留地</title>
+<title>macOS 上 Python 虚拟环境的管理: pyenv | 自留地</title>
 <link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1603800611819">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://kioipp.cn/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="Python实例方法、类方法和静态方法举例理解 | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="macOS 上 Python 虚拟环境的管理: pyenv | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
@@ -20,20 +20,20 @@
 </script>
 
 
-    <meta name="description" content="一次性理解实例方法、静态方法和类方法。
+    <meta name="description" content="
+&quot;Shit moutain.&quot;
 
-今天的对象：
 
-@classmethod 类方法；
-@staticmethod 静态方法；
-普通实例方法；
+项目地址
 
-1. 基本类
-先写从普通的一个类写起：
+https://github.com/pyenv/pyenv
 
-class Fruit(object):
+安装
+brew install pyenv
 
- ..." />
+命令
+列出当前已安装的 python 版本
+pyenv ve..." />
     <meta name="keywords" content="Python" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -104,14 +104,14 @@ class Fruit(object):
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              Python实例方法、类方法和静态方法举例理解
+              macOS 上 Python 虚拟环境的管理: pyenv
             </h2>
             <div class="post-info">
               <span>
-                2020-10-20
+                2020-10-27
               </span>
               <span>
-                3 min read
+                1 min read
               </span>
               
                 <a href="https://kioipp.cn/tag/Ibdm9Nbeq/" class="post-tag">
@@ -122,120 +122,51 @@ class Fruit(object):
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <p>一次性理解实例方法、静态方法和类方法。</p>
+                <blockquote>
+<p>&quot;Shit moutain.&quot;</p>
+</blockquote>
 <!-- more -->
-<p>今天的对象：</p>
-<ul>
-<li>@classmethod 类方法；</li>
-<li>@staticmethod 静态方法；</li>
-<li>普通实例方法；</li>
-</ul>
-<h3 id="1-基本类">1. 基本类</h3>
-<p>先写从普通的一个类写起：</p>
-<pre><code class="language-python">
-class Fruit(object):
-
-    def __init__(self, name):
-        self.name = name
-
-apple = Fruit('apple')
+<h2 id="项目地址">项目地址</h2>
+<blockquote>
+<p>https://github.com/pyenv/pyenv</p>
+</blockquote>
+<h2 id="安装">安装</h2>
+<pre><code>brew install pyenv
 </code></pre>
-<p>这个时候，我们称<code>Fruit</code>为<code>class（类）</code>，<code>apple</code>为<code>instance（实例）</code>。</p>
-<hr>
-<h3 id="2-实例方法">2. 实例方法</h3>
-<p>接下来再添加一个值<code>price</code>和方法<code>show_price</code>：</p>
-<pre><code class="language-python">
-class Fruit(object):
-
-    def __init__(self, name, price):
-        self.name = name
-        self.price = price
-
-    def show_price(self):
-        print(f'The price is {self.price}')
-
-apple = Fruit('apple', 7.0)
-apple.show_price()
+<h2 id="命令">命令</h2>
+<p>列出当前已安装的 python 版本</p>
+<pre><code>pyenv version
 </code></pre>
-<p>这个时候，<code>apple.show_price</code>就是<code>apple</code>这个实例的<code>instance method（实例方法）</code>。<br>
-直接用 Fruit.show_price() 调用会出错，从两个概念上说：</p>
-<ul>
-<li>instance method是<code>实例方法</code>，只能由<code>实例</code>调用，不能由<code>类</code>调用。<code>show_price(self)</code>的第一个参数是<code>实例</code>。</li>
-<li><code>水果</code>没有价格的概念，<code>苹果</code>才有。</li>
-</ul>
-<hr>
-<h3 id="3-类方法">3. 类方法</h3>
-<p>继续添加一个方法<code>eat()</code>：</p>
-<pre><code class="language-python">
-class Fruit(object):
-
-    def __init__(self, name, price):
-        self.name = name
-        self.price = price
-
-    def show_price(self):
-        print(f'The price is {self.price}')
-
-    @classmethod
-    def eat(cls):
-        print(&quot;Enjoy.&quot;)
-
-apple = Fruit('apple', 7.0)
-apple.show_price()
-Fruit.eat()
-apple.eat()
+<p>列出可安装版本</p>
+<pre><code>pyenv install --list
 </code></pre>
-<p>同样，我们从两个纬度理解：</p>
-<ul>
-<li><code>eat(cls)</code>的参数是 <code>cls</code>，即类是它的参数，因此可以从类直接调用。实例也是类，因此实例也可以调用。类方法主要用于一些不需要实例化类就能调用的方法。</li>
-<li>绝大部分水果具有可以食用的属性，因此说<code>吃水果</code>和<code>吃苹果</code>在逻辑上都成立。</li>
-</ul>
-<hr>
-<h3 id="4-静态方法">4. 静态方法</h3>
-<p>这次我们添加一个静态方法 <code>will_go_bad()</code> 和一个外部的静态变量 <code>BAD_WEATHER</code></p>
-<pre><code class="language-python">
-BAD_WEATHER = True
-
-class Fruit(object):
-
-    def __init__(self, name, price):
-        self.name = name
-        self.price = price
-
-    def show_price(self):
-        print(f'The price is {self.price}')
-
-    @classmethod
-    def eat(cls):
-        print(&quot;Enjoy.&quot;)
-
-    @staticmethod
-    def will_go_bad():
-        if BAD_WEATHER:
-            return True
-
-apple = Fruit('apple', 7.0)
-apple.will_go_bad()
-Fruit.will_go_bad()
+<p>列出当前可用的虚拟环境</p>
+<pre><code>pyenv  virtualenvs
 </code></pre>
-<ul>
-<li>从空间上理解，静态方法 <code>will_go_bad()</code> 只是定义在类这个空间（类命名空间）中，没有任何特殊的<code>cls</code> 或者<code>self</code> 的绑定，它也<code>不能访问类里任何的对象或者方法</code>。和全局函数不同的是，它只能通过访问类这个空间来调用。静态方法用于处理类外部依赖的交互。</li>
-<li>从逻辑上理解，坏天气会影响水果的好坏；但坏天气和水果之间是不能互相访问的，只能通过某种逻辑进行关联。</li>
-</ul>
+<p>创建虚拟环境</p>
+<pre><code>pyenv virtualenv &lt;Python 版本号&gt; &lt;虚拟环境名称&gt;
+</code></pre>
+<p>激活虚拟环境</p>
+<pre><code>pyenv activate &lt;虚拟环境名称&gt;
+</code></pre>
+<p>退出虚拟环境</p>
+<pre><code>pyenv deactivate
+</code></pre>
+<p>删除虚拟环境</p>
+<pre><code>pyenv uninstall &lt;虚拟环境名称&gt;
+</code></pre>
+<h2 id="vscode">Vscode</h2>
+<p>把工作区配置文件里的 <code>&quot;python.pythonPath&quot;</code> 换成 <code>pyenv which python</code> 打印的路径。</p>
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
 <li>
 <ul>
-<li>
-<ul>
-<li><a href="#1-%E5%9F%BA%E6%9C%AC%E7%B1%BB">1. 基本类</a></li>
-<li><a href="#2-%E5%AE%9E%E4%BE%8B%E6%96%B9%E6%B3%95">2. 实例方法</a></li>
-<li><a href="#3-%E7%B1%BB%E6%96%B9%E6%B3%95">3. 类方法</a></li>
-<li><a href="#4-%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95">4. 静态方法</a></li>
-</ul>
-</li>
+<li><a href="#%E9%A1%B9%E7%9B%AE%E5%9C%B0%E5%9D%80">项目地址</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
+<li><a href="#%E5%91%BD%E4%BB%A4">命令</a></li>
+<li><a href="#vscode">Vscode</a></li>
 </ul>
 </li>
 </ul>
@@ -248,9 +179,9 @@ Fruit.will_go_bad()
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://kioipp.cn/post/managepy-jian-ming-hao-yong-de-cli-builder/">
+            <a href="https://kioipp.cn/post/python-shi-li-fang-fa-lei-fang-fa-he-jing-tai-fang-fa-ju-li-li-jie/">
               <h3 class="post-title">
-                manage.py: 简明好用的 CLI builder
+                Python实例方法、类方法和静态方法举例理解
               </h3>
             </a>
           </div>

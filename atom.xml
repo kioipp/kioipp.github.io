@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-10-20T12:11:12.863Z</updated>
+    <updated>2020-10-27T12:10:20.611Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,53 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[macOS 上 Python 虚拟环境的管理: pyenv]]></title>
+        <id>https://kioipp.cn/post/macos-shang-python-xu-ni-huan-jing-de-guan-li-pyenv/</id>
+        <link href="https://kioipp.cn/post/macos-shang-python-xu-ni-huan-jing-de-guan-li-pyenv/">
+        </link>
+        <updated>2020-10-27T12:03:17.000Z</updated>
+        <summary type="html"><![CDATA[<blockquote>
+<p>&quot;Shit moutain.&quot;</p>
+</blockquote>
+]]></summary>
+        <content type="html"><![CDATA[<blockquote>
+<p>&quot;Shit moutain.&quot;</p>
+</blockquote>
+<!-- more -->
+<h2 id="项目地址">项目地址</h2>
+<blockquote>
+<p>https://github.com/pyenv/pyenv</p>
+</blockquote>
+<h2 id="安装">安装</h2>
+<pre><code>brew install pyenv
+</code></pre>
+<h2 id="命令">命令</h2>
+<p>列出当前已安装的 python 版本</p>
+<pre><code>pyenv version
+</code></pre>
+<p>列出可安装版本</p>
+<pre><code>pyenv install --list
+</code></pre>
+<p>列出当前可用的虚拟环境</p>
+<pre><code>pyenv  virtualenvs
+</code></pre>
+<p>创建虚拟环境</p>
+<pre><code>pyenv virtualenv &lt;Python 版本号&gt; &lt;虚拟环境名称&gt;
+</code></pre>
+<p>激活虚拟环境</p>
+<pre><code>pyenv activate &lt;虚拟环境名称&gt;
+</code></pre>
+<p>退出虚拟环境</p>
+<pre><code>pyenv deactivate
+</code></pre>
+<p>删除虚拟环境</p>
+<pre><code>pyenv uninstall &lt;虚拟环境名称&gt;
+</code></pre>
+<h2 id="vscode">Vscode</h2>
+<p>把工作区配置文件里的 <code>&quot;python.pythonPath&quot;</code> 换成 <code>pyenv which python</code> 打印的路径。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Python实例方法、类方法和静态方法举例理解]]></title>
         <id>https://kioipp.cn/post/python-shi-li-fang-fa-lei-fang-fa-he-jing-tai-fang-fa-ju-li-li-jie/</id>
