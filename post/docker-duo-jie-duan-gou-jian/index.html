@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Docker 多阶段构建 | 自留地</title>
-<link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1603940429708">
+<link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1603940618681">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://kioipp.cn/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Docker 多阶段构建 | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
@@ -36,7 +36,7 @@ Docker multi-stage builds
       <div class="main-content">
         <div class="site-header">
   <a href="https://kioipp.cn">
-  <img class="avatar" src="https://kioipp.cn/images/avatar.png?v=1603940429708" alt="">
+  <img class="avatar" src="https://kioipp.cn/images/avatar.png?v=1603940618681" alt="">
   </a>
   <h1 class="site-title">
     自留地
@@ -137,7 +137,7 @@ Docker multi-stage builds
 <h2 id="例子">例子</h2>
 <p>这里摘抄两个在网上看到的 python 的例子：</p>
 <h3 id="使用-wheel">使用 wheel</h3>
-<pre><code class="language-dockerfile">FROM python:2.7-alpine as base
+<pre><code>FROM python:2.7-alpine as base
 RUN mkdir /svc
 COPY . /svc
 WORKDIR /svc
@@ -154,7 +154,7 @@ WORKDIR /svc
 RUN pip install --no-index --find-links=/svc/wheels -r requirements.txt
 </code></pre>
 <h3 id="使用-pyinstaller">使用 pyinstaller</h3>
-<pre><code class="language-dockerfile">FROM python:3.6 as build-env
+<pre><code>FROM python:3.6 as build-env
 WORKDIR /app/
 ADD . /app/
 ADD https://github.com/pyinstaller/pyinstaller/archive/develop.zip /app/pyinstaller-develop.zip
