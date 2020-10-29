@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-10-27T12:10:20.611Z</updated>
+    <updated>2020-10-29T03:00:32.687Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,70 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[Docker 多阶段构建]]></title>
+        <id>https://kioipp.cn/post/docker-duo-jie-duan-gou-jian/</id>
+        <link href="https://kioipp.cn/post/docker-duo-jie-duan-gou-jian/">
+        </link>
+        <updated>2020-10-29T02:47:25.000Z</updated>
+        <summary type="html"><![CDATA[<blockquote>
+<p>偷懒是人类进步的阶梯</p>
+</blockquote>
+]]></summary>
+        <content type="html"><![CDATA[<blockquote>
+<p>偷懒是人类进步的阶梯</p>
+</blockquote>
+<!-- more -->
+<p>今天看到一个概念，不是新的，但之前却很奇怪地完全没有接触过。</p>
+<p><a href="https://docs.docker.com/develop/develop-images/multistage-build/">Docker multi-stage builds</a></p>
+<p>简单来说，就是 Dockerfile 支持多次 build，然后把上一次 build 产生的文件直接 COPY 到下一次的 build 过程中。</p>
+<p>相当于第二次的 build 里只执行了一次 COPY，省去中间很多下载、安装、编译的过程。</p>
+<h2 id="优点">优点</h2>
+<ul>
+<li>把 build + run 过程分离，让 run 只负责 run；</li>
+<li>大幅度减少 run 镜像的层数，从而压缩 run 环境的分发和更新时间；</li>
+</ul>
+<h2 id="缺点">缺点</h2>
+<ul>
+<li>对于动态语言来说（比如 SRE 工程师最爱的 Python），依赖环境较难处理，需要用额外的打包工具；</li>
+<li>打包后镜像只有 run 环境，出问题的时候不方便进行 debug；</li>
+</ul>
+<p>从上面的优缺点可以看到，对静态语言，尤其是最后可以打包成二进制的文件来说，多阶段构建的好处是显而易见的，对动态语言来说，就需要各种尝试，确认打包后程序的稳定性。</p>
+<h2 id="例子">例子</h2>
+<p>这里摘抄两个在网上看到的 python 的例子：</p>
+<h3 id="使用-wheel">使用 wheel</h3>
+<pre><code class="language-dockerfile">FROM python:2.7-alpine as base
+RUN mkdir /svc
+COPY . /svc
+WORKDIR /svc
+RUN apk add --update \
+    postgresql-dev \
+    gcc \
+    musl-dev \
+    linux-headers
+RUN pip install wheel &amp;&amp; pip wheel . --wheel-dir=/svc/wheels
+
+FROM python:2.7-alpine
+COPY --from=base /svc /svc
+WORKDIR /svc
+RUN pip install --no-index --find-links=/svc/wheels -r requirements.txt
+</code></pre>
+<h3 id="使用-pyinstaller">使用 pyinstaller</h3>
+<pre><code class="language-dockerfile">FROM python:3.6 as build-env
+WORKDIR /app/
+ADD . /app/
+ADD https://github.com/pyinstaller/pyinstaller/archive/develop.zip /app/pyinstaller-develop.zip
+RUN pip install -r requirements.txt &amp;&amp; \
+    pip install pyinstaller-develop.zip
+RUN pyinstaller --hidden-import=tornado --onefile -d -y run.py
+ 
+FROM frolvlad/alpine-glibc
+WORKDIR /app/
+COPY --from=build-env /app/dist/run .
+ENTRYPOINT [&quot;./run&quot;]
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[macOS 上 Python 虚拟环境的管理: pyenv]]></title>
         <id>https://kioipp.cn/post/macos-shang-python-xu-ni-huan-jing-de-guan-li-pyenv/</id>
