@@ -2,11 +2,11 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>macOS 上 Python 虚拟环境的管理: pyenv | 自留地</title>
+<title>Python3: 快速来一发装饰器 | 自留地</title>
 <link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1604924385511">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://kioipp.cn/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="macOS 上 Python 虚拟环境的管理: pyenv | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="Python3: 快速来一发装饰器 | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
@@ -20,20 +20,14 @@
 </script>
 
 
-    <meta name="description" content="
-&quot;Shit moutain.&quot;
+    <meta name="description" content="一直非常喜欢这个东西，简洁、明快～
+
+from decorator import decorator
+import time
 
 
-项目地址
-
-https://github.com/pyenv/pyenv
-
-安装
-brew install pyenv
-
-命令
-列出当前已安装的 python 版本
-pyenv ve..." />
+@decorator
+def time_counter(func, ignore: bool = False,..." />
     <meta name="keywords" content="Python" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -104,11 +98,11 @@ pyenv ve..." />
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              macOS 上 Python 虚拟环境的管理: pyenv
+              Python3: 快速来一发装饰器
             </h2>
             <div class="post-info">
               <span>
-                2020-10-27
+                2020-11-09
               </span>
               <span>
                 1 min read
@@ -120,59 +114,57 @@ pyenv ve..." />
               
             </div>
             
-              <img class="post-feature-image" src="https://kioipp.cn/post-images/macos-shang-python-xu-ni-huan-jing-de-guan-li-pyenv.jpg" alt="">
+              <img class="post-feature-image" src="https://kioipp.cn/post-images/python3-kuai-su-lai-yi-fa-zhuang-shi-qi.jpg" alt="">
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <blockquote>
-<p>&quot;Shit moutain.&quot;</p>
-</blockquote>
+                <p>一直非常喜欢这个东西，简洁、明快～</p>
 <!-- more -->
-<h2 id="项目地址">项目地址</h2>
-<blockquote>
-<p>https://github.com/pyenv/pyenv</p>
-</blockquote>
-<h2 id="安装">安装</h2>
-<pre><code>brew install pyenv
+<pre><code class="language-python">from decorator import decorator
+import time
+
+
+@decorator
+def time_counter(func, ignore: bool = False, *args, **kwargs):
+    start = time.time()
+    if ignore:
+        result = False
+    else:
+        result = func(*args, **kwargs)
+    end = time.time()
+    delta = end - start
+    print(f&quot;The function runs {delta} seconds.&quot;)
+    return result
+
+
+@time_counter
+def do_sleep(secondes):
+    time.sleep(secondes)
+    return True
+
+
+@time_counter(ignore=True)
+def do_nothing(secondes):
+    time.sleep(secondes)
+    return True
+
+
+if do_sleep(4.5):
+    print(&quot;Take a sleep :)&quot;)
+if not do_nothing(4.5):
+    print(&quot;Doing nothing :(&quot;)
 </code></pre>
-<h2 id="命令">命令</h2>
-<p>列出当前已安装的 python 版本</p>
-<pre><code>pyenv version
+<hr>
+<pre><code class="language-bash">$ python3 de_func.py
+The function runs 4.505078077316284 seconds.
+Take a sleep :)
+The function runs 0.0 seconds.
+Doing nothing :(
 </code></pre>
-<p>列出可安装版本</p>
-<pre><code>pyenv install --list
-</code></pre>
-<p>列出当前可用的虚拟环境</p>
-<pre><code>pyenv  virtualenvs
-</code></pre>
-<p>创建虚拟环境</p>
-<pre><code>pyenv virtualenv &lt;Python 版本号&gt; &lt;虚拟环境名称&gt;
-</code></pre>
-<p>激活虚拟环境</p>
-<pre><code>pyenv activate &lt;虚拟环境名称&gt;
-</code></pre>
-<p>退出虚拟环境</p>
-<pre><code>pyenv deactivate
-</code></pre>
-<p>删除虚拟环境</p>
-<pre><code>pyenv uninstall &lt;虚拟环境名称&gt;
-</code></pre>
-<h2 id="vscode">Vscode</h2>
-<p>把工作区配置文件里的 <code>&quot;python.pythonPath&quot;</code> 换成 <code>pyenv which python</code> 打印的路径。</p>
 
               </div>
               <div class="toc-container">
-                <ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#%E9%A1%B9%E7%9B%AE%E5%9C%B0%E5%9D%80">项目地址</a></li>
-<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
-<li><a href="#%E5%91%BD%E4%BB%A4">命令</a></li>
-<li><a href="#vscode">Vscode</a></li>
-</ul>
-</li>
-</ul>
-
+                
               </div>
             </div>
           </article>
@@ -181,9 +173,9 @@ pyenv ve..." />
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://kioipp.cn/post/python-shi-li-fang-fa-lei-fang-fa-he-jing-tai-fang-fa-ju-li-li-jie/">
+            <a href="https://kioipp.cn/post/docker-duo-jie-duan-gou-jian/">
               <h3 class="post-title">
-                Python实例方法、类方法和静态方法举例理解
+                Docker 多阶段构建
               </h3>
             </a>
           </div>
