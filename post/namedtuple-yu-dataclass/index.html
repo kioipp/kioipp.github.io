@@ -2,11 +2,11 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>macOS 上 Python 虚拟环境的管理: pyenv | 自留地</title>
+<title>namedtuple 与 dataclass | 自留地</title>
 <link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1605251432975">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://kioipp.cn/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="macOS 上 Python 虚拟环境的管理: pyenv | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="namedtuple 与 dataclass | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
@@ -20,20 +20,27 @@
 </script>
 
 
-    <meta name="description" content="
-&quot;Shit moutain.&quot;
+    <meta name="description" content="常用的数据定义类。
+
+对比
 
 
-项目地址
 
-https://github.com/pyenv/pyenv
+class
+require
+write_able
 
-安装
-brew install pyenv
 
-命令
-列出当前已安装的 python 版本
-pyenv ve..." />
+
+
+namedtuple
+&gt;= 2.7
+不可改写或者改写性较差，不能自定义方法
+
+
+dataclass
+&gt;= 3.7
+属性可写可提供默认值（..." />
     <meta name="keywords" content="Python" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -104,14 +111,14 @@ pyenv ve..." />
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              macOS 上 Python 虚拟环境的管理: pyenv
+              namedtuple 与 dataclass
             </h2>
             <div class="post-info">
               <span>
-                2020-10-27
+                2020-11-13
               </span>
               <span>
-                1 min read
+                2 min read
               </span>
               
                 <a href="https://kioipp.cn/tag/Ibdm9Nbeq/" class="post-tag">
@@ -120,57 +127,88 @@ pyenv ve..." />
               
             </div>
             
-              <img class="post-feature-image" src="https://kioipp.cn/post-images/macos-shang-python-xu-ni-huan-jing-de-guan-li-pyenv.jpg" alt="">
+              <img class="post-feature-image" src="https://kioipp.cn/post-images/namedtuple-yu-dataclass.jpg" alt="">
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <blockquote>
-<p>&quot;Shit moutain.&quot;</p>
-</blockquote>
+                <p>常用的数据定义类。</p>
 <!-- more -->
-<h2 id="项目地址">项目地址</h2>
-<blockquote>
-<p>https://github.com/pyenv/pyenv</p>
-</blockquote>
-<h2 id="安装">安装</h2>
-<pre><code>brew install pyenv
+<h1 id="对比">对比</h1>
+<table>
+<thead>
+<tr>
+<th>class</th>
+<th>require</th>
+<th>write_able</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>namedtuple</td>
+<td>&gt;= 2.7</td>
+<td>不可改写或者改写性较差，不能自定义方法</td>
+</tr>
+<tr>
+<td>dataclass</td>
+<td>&gt;= 3.7</td>
+<td>属性可写可提供默认值（也可以 fronzen 后只读），可自定方法，可继续子类</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="namedtuple">namedtuple</h1>
+<p>用起来像是对 tuple 类添加了类似 index 或者 iterm name 的访问方式。</p>
+<pre><code class="language-python"># 定义一个namedtuple类型User，并包含name，sex和age属性。
+User = namedtuple('User', ['name', 'sex', 'age'])
+
+# 创建一个User对象
+user = User(name='kongxx', sex='male', age=21)
+
+# 也可以通过一个list来创建一个User对象，这里注意需要使用&quot;_make&quot;方法
+user = User._make(['kongxx', 'male', 21])
+
+print(user)
+# User(name='user1', sex='male', age=21)
+
+# 获取用户的属性
+print(user.name)
+print(user.sex)
+print(user.age)
+
+# 修改对象属性，注意要使用&quot;_replace&quot;方法，看起来很不优雅
+user = user._replace(age=22)
+print(user)
+# User(name='user1', sex='male', age=21)
+
+# 将User对象转换成字典，注意要使用&quot;_asdict&quot;
+print(user._asdict())
+# OrderedDict([('name', 'kongxx'), ('sex', 'male'), ('age', 22)])
 </code></pre>
-<h2 id="命令">命令</h2>
-<p>列出当前已安装的 python 版本</p>
-<pre><code>pyenv version
+<hr>
+<h1 id="dataclass">dataclass</h1>
+<p>官方文档链接： https://docs.python.org/3/library/dataclasses.html</p>
+<p>简单用法如下，用 py3 function annotion 的语法来创建属性</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class InventoryItem:
+    &quot;&quot;&quot;Class for keeping track of an item in inventory.&quot;&quot;&quot;
+    name: str
+    unit_price: float
+    quantity_on_hand: int = 0
+
+    def total_cost(self) -&gt; float:
+        return self.unit_price * self.quantity_on_hand
 </code></pre>
-<p>列出可安装版本</p>
-<pre><code>pyenv install --list
-</code></pre>
-<p>列出当前可用的虚拟环境</p>
-<pre><code>pyenv  virtualenvs
-</code></pre>
-<p>创建虚拟环境</p>
-<pre><code>pyenv virtualenv &lt;Python 版本号&gt; &lt;虚拟环境名称&gt;
-</code></pre>
-<p>激活虚拟环境</p>
-<pre><code>pyenv activate &lt;虚拟环境名称&gt;
-</code></pre>
-<p>退出虚拟环境</p>
-<pre><code>pyenv deactivate
-</code></pre>
-<p>删除虚拟环境</p>
-<pre><code>pyenv uninstall &lt;虚拟环境名称&gt;
-</code></pre>
-<h2 id="vscode">Vscode</h2>
-<p>把工作区配置文件里的 <code>&quot;python.pythonPath&quot;</code> 换成 <code>pyenv which python</code> 打印的路径。</p>
+<p>有一个扑克牌的例子写得很好： https://juejin.im/post/6844903853700153357</p>
+<!-- more -->
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#%E9%A1%B9%E7%9B%AE%E5%9C%B0%E5%9D%80">项目地址</a></li>
-<li><a href="#%E5%AE%89%E8%A3%85">安装</a></li>
-<li><a href="#%E5%91%BD%E4%BB%A4">命令</a></li>
-<li><a href="#vscode">Vscode</a></li>
-</ul>
-</li>
+<li><a href="#%E5%AF%B9%E6%AF%94">对比</a></li>
+<li><a href="#namedtuple">namedtuple</a></li>
+<li><a href="#dataclass">dataclass</a></li>
 </ul>
 
               </div>
@@ -181,9 +219,9 @@ pyenv ve..." />
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://kioipp.cn/post/python-shi-li-fang-fa-lei-fang-fa-he-jing-tai-fang-fa-ju-li-li-jie/">
+            <a href="https://kioipp.cn/post/python3-kuai-su-lai-yi-fa-zhuang-shi-qi/">
               <h3 class="post-title">
-                Python实例方法、类方法和静态方法举例理解
+                Python3: 快速来一发装饰器
               </h3>
             </a>
           </div>

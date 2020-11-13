@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-11-09T12:19:49.743Z</updated>
+    <updated>2020-11-13T07:10:37.951Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,87 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[namedtuple 与 dataclass]]></title>
+        <id>https://kioipp.cn/post/namedtuple-yu-dataclass/</id>
+        <link href="https://kioipp.cn/post/namedtuple-yu-dataclass/">
+        </link>
+        <updated>2020-11-13T06:29:51.000Z</updated>
+        <summary type="html"><![CDATA[<p>常用的数据定义类。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>常用的数据定义类。</p>
+<!-- more -->
+<h1 id="对比">对比</h1>
+<table>
+<thead>
+<tr>
+<th>class</th>
+<th>require</th>
+<th>write_able</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>namedtuple</td>
+<td>&gt;= 2.7</td>
+<td>不可改写或者改写性较差，不能自定义方法</td>
+</tr>
+<tr>
+<td>dataclass</td>
+<td>&gt;= 3.7</td>
+<td>属性可写可提供默认值（也可以 fronzen 后只读），可自定方法，可继续子类</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1 id="namedtuple">namedtuple</h1>
+<p>用起来像是对 tuple 类添加了类似 index 或者 iterm name 的访问方式。</p>
+<pre><code class="language-python"># 定义一个namedtuple类型User，并包含name，sex和age属性。
+User = namedtuple('User', ['name', 'sex', 'age'])
+
+# 创建一个User对象
+user = User(name='kongxx', sex='male', age=21)
+
+# 也可以通过一个list来创建一个User对象，这里注意需要使用&quot;_make&quot;方法
+user = User._make(['kongxx', 'male', 21])
+
+print(user)
+# User(name='user1', sex='male', age=21)
+
+# 获取用户的属性
+print(user.name)
+print(user.sex)
+print(user.age)
+
+# 修改对象属性，注意要使用&quot;_replace&quot;方法，看起来很不优雅
+user = user._replace(age=22)
+print(user)
+# User(name='user1', sex='male', age=21)
+
+# 将User对象转换成字典，注意要使用&quot;_asdict&quot;
+print(user._asdict())
+# OrderedDict([('name', 'kongxx'), ('sex', 'male'), ('age', 22)])
+</code></pre>
+<hr>
+<h1 id="dataclass">dataclass</h1>
+<p>官方文档链接： https://docs.python.org/3/library/dataclasses.html</p>
+<p>简单用法如下，用 py3 function annotion 的语法来创建属性</p>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class InventoryItem:
+    &quot;&quot;&quot;Class for keeping track of an item in inventory.&quot;&quot;&quot;
+    name: str
+    unit_price: float
+    quantity_on_hand: int = 0
+
+    def total_cost(self) -&gt; float:
+        return self.unit_price * self.quantity_on_hand
+</code></pre>
+<p>有一个扑克牌的例子写得很好： https://juejin.im/post/6844903853700153357</p>
+<!-- more -->
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Python3: 快速来一发装饰器]]></title>
         <id>https://kioipp.cn/post/python3-kuai-su-lai-yi-fa-zhuang-shi-qi/</id>
