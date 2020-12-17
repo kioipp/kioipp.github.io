@@ -2,11 +2,11 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>namedtuple 与 dataclass | 自留地</title>
+<title>python3: dataclass 个人 tips 合集 | 自留地</title>
 <link rel="shortcut icon" href="https://kioipp.cn/favicon.ico?v=1608191586075">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://kioipp.cn/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="namedtuple 与 dataclass | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="python3: dataclass 个人 tips 合集 | 自留地 - Atom Feed" href="https://kioipp.cn/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
@@ -20,27 +20,8 @@
 </script>
 
 
-    <meta name="description" content="常用的数据定义类。
-
-对比
-
-
-
-class
-require
-write_able
-
-
-
-
-namedtuple
-&gt;= 2.7
-不可改写或者改写性较差，不能自定义方法
-
-
-dataclass
-&gt;= 3.7
-属性可写可提供默认值（..." />
+    <meta name="description" content="dataclass 是 python3 很好用的一个官方库，可以有效地节省各类数据体在 __init__() 中重复类似 self.name = name 的书写。
+总（抄）结（袭）了一些好用的自定义方法，让 dataclass 用起来更舒..." />
     <meta name="keywords" content="Python" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -111,11 +92,11 @@ dataclass
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              namedtuple 与 dataclass
+              python3: dataclass 个人 tips 合集
             </h2>
             <div class="post-info">
               <span>
-                2020-11-13
+                2020-12-17
               </span>
               <span>
                 2 min read
@@ -127,88 +108,79 @@ dataclass
               
             </div>
             
-              <img class="post-feature-image" src="https://kioipp.cn/post-images/namedtuple-yu-dataclass.jpg" alt="">
+              <img class="post-feature-image" src="https://kioipp.cn/post-images/python3-dataclass-ge-ren-tips-he-ji.jpg" alt="">
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <p>常用的数据定义类。</p>
-<!-- more -->
-<h1 id="对比">对比</h1>
-<table>
-<thead>
-<tr>
-<th>class</th>
-<th>require</th>
-<th>write_able</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>namedtuple</td>
-<td>&gt;= 2.7</td>
-<td>不可改写或者改写性较差，不能自定义方法</td>
-</tr>
-<tr>
-<td>dataclass</td>
-<td>&gt;= 3.7</td>
-<td>属性可写可提供默认值（也可以 fronzen 后只读），可自定方法，可继续子类</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h1 id="namedtuple">namedtuple</h1>
-<p>用起来像是对 tuple 类添加了类似 index 或者 iterm name 的访问方式。</p>
-<pre><code class="language-python"># 定义一个namedtuple类型User，并包含name，sex和age属性。
-User = namedtuple('User', ['name', 'sex', 'age'])
+                <p><code>dataclass</code> 是 python3 很好用的一个官方库，可以有效地节省各类数据体在 <code>__init__()</code> 中重复类似 self.name = name 的书写。</p>
+<p>总（抄）结（袭）了一些好用的自定义方法，让 <code>dataclass</code> 用起来更舒服。</p>
+<h2 id="返回所有非-none-元素作为字典">返回所有非 None 元素作为字典</h2>
+<pre><code class="language-python">from dataclasses import dataclass, asdict, fields
 
-# 创建一个User对象
-user = User(name='kongxx', sex='male', age=21)
 
-# 也可以通过一个list来创建一个User对象，这里注意需要使用&quot;_make&quot;方法
-user = User._make(['kongxx', 'male', 21])
+def factory_filter(data: list) -&gt; dict:
+    return dict(duple_item for duple_item in data if duple_item[1] is not None)
 
-print(user)
-# User(name='user1', sex='male', age=21)
-
-# 获取用户的属性
-print(user.name)
-print(user.sex)
-print(user.age)
-
-# 修改对象属性，注意要使用&quot;_replace&quot;方法，看起来很不优雅
-user = user._replace(age=22)
-print(user)
-# User(name='user1', sex='male', age=21)
-
-# 将User对象转换成字典，注意要使用&quot;_asdict&quot;
-print(user._asdict())
-# OrderedDict([('name', 'kongxx'), ('sex', 'male'), ('age', 22)])
-</code></pre>
-<hr>
-<h1 id="dataclass">dataclass</h1>
-<p>官方文档链接： https://docs.python.org/3/library/dataclasses.html</p>
-<p>简单用法如下，用 py3 function annotion 的语法来创建属性</p>
-<pre><code class="language-python">from dataclasses import dataclass
 
 @dataclass
-class InventoryItem:
-    &quot;&quot;&quot;Class for keeping track of an item in inventory.&quot;&quot;&quot;
-    name: str
-    unit_price: float
-    quantity_on_hand: int = 0
+class BaseDataClass:
+    &quot;&quot;&quot;基础数据类&quot;&quot;&quot;
 
-    def total_cost(self) -&gt; float:
-        return self.unit_price * self.quantity_on_hand
+    def get_data(self) -&gt; dict:
+        &quot;&quot;&quot;返回所有非 None 元素的字典&quot;&quot;&quot;
+        return asdict(self, dict_factory=factory_filter)
 </code></pre>
-<p>有一个扑克牌的例子写得很好： https://juejin.im/post/6844903853700153357</p>
-<!-- more -->
+<p>测试：</p>
+<pre><code class="language-python">@dataclass
+class Person(BaseDataClass):
+    name: str
+    age: str
+    sex: str = None
+
+
+peter = Person(name=&quot;peter&quot;, age=17)
+peter.get_data()
+</code></pre>
+<p>输出:</p>
+<pre><code class="language-json">{'name': 'peter', 'age': 17}
+</code></pre>
+<hr>
+<h2 id="工厂方法自动忽略未定义的传入变量">工厂方法：自动忽略未定义的传入变量</h2>
+<p>如果用传入未定义的变量，那么会自动出错，比如：</p>
+<pre><code class="language-python">peter = Person(name=&quot;peter&quot;, age=17, job='student')
+---------------------------------------------------------------------------
+TypeError  Traceback (most recent call last)
+&lt;ipython-input-4-948a3ccfe901&gt; in &lt;module&gt;
+      6 
+      7 
+----&gt; 8 peter = Person(name=&quot;peter&quot;, age=17, job='student')
+
+TypeError: __init__() got an unexpected keyword argument 'job'
+</code></pre>
+<p>还是上面的 <code>BaseDataClass</code>， 添加类方法：</p>
+<pre><code class="language-python">    @classmethod
+    def create_from_dict(cls, **dict_) -&gt; dataclass:
+        &quot;&quot;&quot;工厂方法，自动忽略非 dataclass 参数&quot;&quot;&quot;
+        class_fields = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in dict_.items() if k in class_fields})
+</code></pre>
+<p>再试一次：</p>
+<pre><code class="language-python">peter = Person(name=&quot;peter&quot;, age=17)
+print(Person.create_from_dict(name=&quot;peter&quot;, age=17, job='student').get_data())
+</code></pre>
+<p>输出:</p>
+<pre><code class="language-json">{'name': 'peter', 'age': 17}
+</code></pre>
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
-<li><a href="#%E5%AF%B9%E6%AF%94">对比</a></li>
-<li><a href="#namedtuple">namedtuple</a></li>
-<li><a href="#dataclass">dataclass</a></li>
+<li>
+<ul>
+<li><a href="#%E8%BF%94%E5%9B%9E%E6%89%80%E6%9C%89%E9%9D%9E-none-%E5%85%83%E7%B4%A0%E4%BD%9C%E4%B8%BA%E5%AD%97%E5%85%B8">返回所有非 None 元素作为字典</a></li>
+<li><a href="#%E5%B7%A5%E5%8E%82%E6%96%B9%E6%B3%95%E8%87%AA%E5%8A%A8%E5%BF%BD%E7%95%A5%E6%9C%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E4%BC%A0%E5%85%A5%E5%8F%98%E9%87%8F">工厂方法：自动忽略未定义的传入变量</a></li>
+</ul>
+</li>
 </ul>
 
               </div>
@@ -219,9 +191,9 @@ class InventoryItem:
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://kioipp.cn/post/python3-kuai-su-lai-yi-fa-zhuang-shi-qi/">
+            <a href="https://kioipp.cn/post/xie-gei-zi-ji-de-golang-cheatsheet/">
               <h3 class="post-title">
-                Python3: 快速来一发装饰器
+                写给自己的 Golang Cheatsheet
               </h3>
             </a>
           </div>

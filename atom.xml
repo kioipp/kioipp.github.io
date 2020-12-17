@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-11-16T03:43:45.528Z</updated>
+    <updated>2020-12-17T07:53:08.501Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,83 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[python3: dataclass 个人 tips 合集]]></title>
+        <id>https://kioipp.cn/post/python3-dataclass-ge-ren-tips-he-ji/</id>
+        <link href="https://kioipp.cn/post/python3-dataclass-ge-ren-tips-he-ji/">
+        </link>
+        <updated>2020-12-17T07:16:02.000Z</updated>
+        <content type="html"><![CDATA[<p><code>dataclass</code> 是 python3 很好用的一个官方库，可以有效地节省各类数据体在 <code>__init__()</code> 中重复类似 self.name = name 的书写。</p>
+<p>总（抄）结（袭）了一些好用的自定义方法，让 <code>dataclass</code> 用起来更舒服。</p>
+<h2 id="返回所有非-none-元素作为字典">返回所有非 None 元素作为字典</h2>
+<pre><code class="language-python">from dataclasses import dataclass, asdict, fields
+
+
+def factory_filter(data: list) -&gt; dict:
+    return dict(duple_item for duple_item in data if duple_item[1] is not None)
+
+
+@dataclass
+class BaseDataClass:
+    &quot;&quot;&quot;基础数据类&quot;&quot;&quot;
+
+    def get_data(self) -&gt; dict:
+        &quot;&quot;&quot;返回所有非 None 元素的字典&quot;&quot;&quot;
+        return asdict(self, dict_factory=factory_filter)
+</code></pre>
+<p>测试：</p>
+<pre><code class="language-python">@dataclass
+class Person(BaseDataClass):
+    name: str
+    age: str
+    sex: str = None
+
+
+peter = Person(name=&quot;peter&quot;, age=17)
+peter.get_data()
+</code></pre>
+<p>输出:</p>
+<pre><code class="language-json">{'name': 'peter', 'age': 17}
+</code></pre>
+<hr>
+<h2 id="工厂方法自动忽略未定义的传入变量">工厂方法：自动忽略未定义的传入变量</h2>
+<p>如果用传入未定义的变量，那么会自动出错，比如：</p>
+<pre><code class="language-python">peter = Person(name=&quot;peter&quot;, age=17, job='student')
+---------------------------------------------------------------------------
+TypeError  Traceback (most recent call last)
+&lt;ipython-input-4-948a3ccfe901&gt; in &lt;module&gt;
+      6 
+      7 
+----&gt; 8 peter = Person(name=&quot;peter&quot;, age=17, job='student')
+
+TypeError: __init__() got an unexpected keyword argument 'job'
+</code></pre>
+<p>还是上面的 <code>BaseDataClass</code>， 添加类方法：</p>
+<pre><code class="language-python">    @classmethod
+    def create_from_dict(cls, **dict_) -&gt; dataclass:
+        &quot;&quot;&quot;工厂方法，自动忽略非 dataclass 参数&quot;&quot;&quot;
+        class_fields = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in dict_.items() if k in class_fields})
+</code></pre>
+<p>再试一次：</p>
+<pre><code class="language-python">peter = Person(name=&quot;peter&quot;, age=17)
+print(Person.create_from_dict(name=&quot;peter&quot;, age=17, job='student').get_data())
+</code></pre>
+<p>输出:</p>
+<pre><code class="language-json">{'name': 'peter', 'age': 17}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[写给自己的 Golang Cheatsheet]]></title>
+        <id>https://kioipp.cn/post/xie-gei-zi-ji-de-golang-cheatsheet/</id>
+        <link href="https://kioipp.cn/post/xie-gei-zi-ji-de-golang-cheatsheet/">
+        </link>
+        <updated>2020-11-18T07:02:58.000Z</updated>
+        <content type="html"><![CDATA[<pre><code class="language-go">:=
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[namedtuple 与 dataclass]]></title>
         <id>https://kioipp.cn/post/namedtuple-yu-dataclass/</id>
