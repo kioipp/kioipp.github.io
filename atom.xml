@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.cn</id>
     <title>自留地</title>
-    <updated>2020-12-17T07:53:08.501Z</updated>
+    <updated>2020-12-31T07:42:34.117Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.cn"/>
     <link rel="self" href="https://kioipp.cn/atom.xml"/>
@@ -10,6 +10,47 @@
     <logo>https://kioipp.cn/images/avatar.png</logo>
     <icon>https://kioipp.cn/favicon.ico</icon>
     <rights>All rights reserved 2020, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[2020.12.31]]></title>
+        <id>https://kioipp.cn/post/20201231/</id>
+        <link href="https://kioipp.cn/post/20201231/">
+        </link>
+        <updated>2020-12-31T06:48:50.000Z</updated>
+        <summary type="html"><![CDATA[<p>又是一年结束的反省。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>又是一年结束的反省。</p>
+<!-- more -->
+<h2 id="工作">工作</h2>
+<p>结束了一段 3 年的岗位，如愿以偿地到了某 E 厂。<br>
+尽管岗位有点不太理想，但也算是到了新环境，看到了很多新鲜的事情（But fresh not means good)。<br>
+回顾上一份工作的收获，应该是让我找到了自己的定位，或者说要努力的方向。毕业后糊里糊涂地过了 5 年，然后又经历了 2 年才看到自己尚且可做且还有些喜欢的一条路，可能浪费的时间有点多。但之前的经验是，每一份不起眼或者当时觉得无用的经历其实都是某种成长，在之后某个时刻一定会成为你脚下的基石。<br>
+迷茫的时候请认真做好现在每一件能做的事情，并且踏实地做到极致。<br>
+在这个基础上再去反思自己是否有更好的方向。</p>
+<p>Time is short 。</p>
+<p>且先扎实一年看看。</p>
+<h2 id="电影">电影</h2>
+<p>因为疫情的原因今年去电影院看电影的次数屈指可数，基本是在手机、电视或者电脑上完成观影。<br>
+节奏也还 OK，在慢慢清理一部分之前某个人给我列的清单，大概看完也这样了。<br>
+是不是每次看完电影后写个双向链接笔记，做一些自我回顾和写作，前期可以一个月至少一次？<br>
+我觉得可以有。<br>
+慢慢在补一些之前没来得及或者因为懒癌发作而错过的日常番。</p>
+<h2 id="游戏">游戏</h2>
+<p>似乎今年玩游戏的整体时间少了很多，但有时候还是会放纵自己，比如今年国庆期间的 5 天假期，一个人宅家里昏天黑地地一直撸无主之地3，等日子过去了才想打脸：干点啥不好？<br>
+明年期待的是怪物猎人新作，其他时间尽量在手机上打发，这样还可以陪陪老婆（笑）。<br>
+总的来讲还是要继续减少游戏时间……</p>
+<h2 id="健康">健康</h2>
+<p>体重悄无声息地往上走，但我最不能忍的是肚子竟然变大了……为此焦虑了好一段时间，并买了升降电脑桌。<br>
+健身环和有氧拳击玩了一段时间后没有再继续，是时候继续捡起来，不能再放任自己的腹部继续膨胀……<br>
+比如先从每周玩个三次，再增加到四次，或者早上起来锻炼？<br>
+为了管理体态请对自己狠一点……</p>
+<h2 id="关系">关系</h2>
+<p>要更关爱家人，每周主动给爸妈打个电话。<br>
+明年买好房子，然后把关系定下来？</p>
+<blockquote>
+<p>逝者不可追。</p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[python3: dataclass 个人 tips 合集]]></title>
         <id>https://kioipp.cn/post/python3-dataclass-ge-ren-tips-he-ji/</id>
@@ -771,16 +812,6 @@ MachineError: &quot;Can't trigger event clean_up from state asleep!&quot;
 1
 </code></pre>
 <p>TOBE Continued .</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[2020.10.12]]></title>
-        <id>https://kioipp.cn/post/20201012/</id>
-        <link href="https://kioipp.cn/post/20201012/">
-        </link>
-        <updated>2020-10-12T07:59:20.000Z</updated>
-        <content type="html"><![CDATA[<p>深圳非常难得地出现了秋天。</p>
-<p>摸鱼摸出了轻微的焦虑。</p>
 ]]></content>
     </entry>
 </feed>
