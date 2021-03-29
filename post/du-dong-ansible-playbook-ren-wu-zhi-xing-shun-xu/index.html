@@ -1,0 +1,290 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>浅谈 Ansible Playbook 任务执行顺序组织 | 自留地</title>
+<link rel="shortcut icon" href="https://kioipp.com/favicon.ico?v=1617018163404">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://kioipp.com/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="浅谈 Ansible Playbook 任务执行顺序组织 | 自留地 - Atom Feed" href="https://kioipp.com/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-180152144-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-180152144-1');
+</script>
+
+
+    <meta name="description" content="根据 strategy 和 serial 及 forks 数测试 Playbook 实际执行顺序。
+基本概念
+官方文档参考：
+
+https://docs.ansible.com/ansible/latest/user_guide/playb..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://kioipp.com">
+  <img class="avatar" src="https://kioipp.com/images/avatar.png?v=1617018163404" alt="">
+  </a>
+  <h1 class="site-title">
+    自留地
+  </h1>
+  <p class="site-description">
+    梦里不知身是客，一晌贪欢。
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/kioipp" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+        <a href="https://weibo.com/579922425" target="_blank">
+          <i class="ri-weibo-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              浅谈 Ansible Playbook 任务执行顺序组织
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-03-29
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>根据 strategy 和 serial 及 forks 数测试 Playbook 实际执行顺序。</p>
+<h1 id="基本概念">基本概念</h1>
+<p>官方文档参考：</p>
+<blockquote>
+<p>https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html</p>
+</blockquote>
+<h2 id="strategy">strategy</h2>
+<p>单个 play 级的调度策略，定义执行实例是否有步骤锁，即单个 task 是否等待其他实例执行完成。具体有两种方式：</p>
+<ul>
+<li>linear</li>
+</ul>
+<blockquote>
+<p>Task execution is in lockstep per host batch as defined by serial (default all). Up to the fork limit of hosts will execute each task at the same time and then the next series of hosts until the batch is done, before going on to the next task.</p>
+</blockquote>
+<p>默认值。在一个实例分组(serial)内，开始执行下一个任务需要等待<code>所有</code>实例上一个任务执行完成。</p>
+<ul>
+<li>free</li>
+</ul>
+<blockquote>
+<p>Task execution is as fast as possible per batch as defined by serial (default all). Ansible will not wait for other hosts to finish the current task before queuing more tasks for other hosts. All hosts are still attempted for the current task, but it prevents blocking new tasks for hosts that have already finished.<br>
+With the free strategy, unlike the default linear strategy, a host that is slow or stuck on a specific task won’t hold up the rest of the hosts and tasks.</p>
+</blockquote>
+<p>非默认值。在一个实例分组(serial)内，开始执行下一个任务需要两个条件：</p>
+<ul>
+<li><code>本实例</code>上一个任务执行完成，</li>
+<li>下一个任务的并发数(forks)有冗余。</li>
+</ul>
+<h2 id="forks">forks</h2>
+<blockquote>
+<p>Maximum number of simultaneous connections Ansible made on each Task.</p>
+</blockquote>
+<p>并发数。在单个分组和单个任务中，同时执行任务的最大实例数。</p>
+<h2 id="serial">serial</h2>
+<p>默认值为 <code>all</code> 。定义单轮执行实例的数量。当一轮实例<code>全部</code>执行完成后，下一轮的实例才会执行。</p>
+<h1 id="举例说明">举例说明</h1>
+<p>定义5个实例数和2个任务，每个任务耗时5s:</p>
+<ul>
+<li>Node: C1\C2\C3\C4\C5</li>
+<li>Task:T1(5s), T2(5s)</li>
+</ul>
+<p>先看看不同 <code>strategy</code> 场景：</p>
+<p><em><strong>场景1</strong>：strategy=linear, forks=5, (serial=all)</em></p>
+<p>T1: C1-C2-C3-C4-C5 （5s）<br>
+T2: C1-C2-C3-C4-C5 （5s）</p>
+<p>总耗时 <code>10s</code></p>
+<p><em><strong>场景2</strong>: strategy=free, forks=5, (serial=all)</em></p>
+<p>C1: T1-&gt;T2, 同时 C2: T1-&gt; T2，同时 C3: T1-&gt;T2，同时 C4: T1-&gt;T2，同时 C5：T1-&gt;T2</p>
+<p>总耗时 <code>10s</code></p>
+<p>在这个基础上修改 <code>forks</code> 数量，再看看不同 <code>strategy</code> 场景</p>
+<p><em><strong>场景3</strong>：strategy=linear, forks=3, (serial=all)</em></p>
+<p>C1: T1-&gt;T2, 同时 C2: T1-&gt; T2，同时 C3: T1-&gt;T2<br>
+C4: T1-&gt;T2，同时 C5：T1-&gt;T2</p>
+<p>总耗时 <code>20s</code></p>
+<p><em><strong>场景4</strong>：strategy=free, forks=3, (serial=all)</em></p>
+<p>T1: C1-C2-C3 （5s）<br>
+T1: C4-C5 （5s）<br>
+T2: C1-C2-C3 （5s）<br>
+T2: C4-C5 （5s）</p>
+<p>和场景3一样：<code>20s</code><br>
+场景4和场景3表现一致：虽然单个实例之间互相无关联，但 C1-C2-C3 执行完 T1 前，T1最大 forks 为3，C4和C5需要等当前 T1 forks 有冗余时才能继续执行。</p>
+<p>在 forks 为5时，修改 serial 的值：</p>
+<p><em><strong>场景5</strong>：strategy=linear, forks=5, serial=3</em></p>
+<p>T1: C1-C2-C3 （5s）<br>
+T2: C1-C2-C3 （5s）<br>
+T1: C4-C5 （5s）<br>
+T2: C4-C5 （5s）</p>
+<p>总耗时 <code>20s</code></p>
+<p><em><strong>场景6</strong>：strategy=free, forks=5, serial=3</em></p>
+<p>T1: C1-C2-C3 （5s）<br>
+T2: C1-C2-C3 （5s）<br>
+T1: C4-C5 （5s）<br>
+T2: C4-C5 （5s）</p>
+<p>总耗时 <code>20s</code></p>
+<p>当 forks=3，serial=3 时：</p>
+<p><em><strong>场景7</strong>：strategy=linear, forks=3, serial=3</em></p>
+<p>和场景5一致。</p>
+<p><em><strong>场景8</strong>：strategy=free, forks=3, serial=3</em></p>
+<p>和场景6一致。</p>
+<p>当 forks 小于 serial 时：</p>
+<p><em><strong>场景9</strong>：strategy=linear, forks=2, serial=3</em></p>
+<p>T1: C1-C2 (5s)<br>
+T1: C3 （5s）<br>
+T2: C1-C2 （5s）<br>
+T2: C3 （5s）<br>
+T1: C4-C5 (5s)<br>
+T2: C4-C5 (5s)</p>
+<p>总耗时 <code>30s</code></p>
+<p><em><strong>场景10</strong>：strategy=free, forks=2, serial=3</em></p>
+<p>T1: C1-C2 (5s)<br>
+T2: C1-C2  (5s)<br>
+T1: C3 （5s）<br>
+T2: C3 （5s）<br>
+T1: C4-C5 (5s)<br>
+T2: C4-C5 (5s)</p>
+<p>总耗时 <code>30s</code></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5">基本概念</a>
+<ul>
+<li><a href="#strategy">strategy</a></li>
+<li><a href="#forks">forks</a></li>
+<li><a href="#serial">serial</a></li>
+</ul>
+</li>
+<li><a href="#%E4%B8%BE%E4%BE%8B%E8%AF%B4%E6%98%8E">举例说明</a></li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://kioipp.com/post/20201231/">
+              <h3 class="post-title">
+                2020.12.31
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://kioipp.com/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

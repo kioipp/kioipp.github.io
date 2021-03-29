@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://kioipp.com</id>
     <title>自留地</title>
-    <updated>2021-02-22T07:24:09.945Z</updated>
+    <updated>2021-03-29T11:42:45.635Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://kioipp.com"/>
     <link rel="self" href="https://kioipp.com/atom.xml"/>
@@ -10,6 +10,109 @@
     <logo>https://kioipp.com/images/avatar.png</logo>
     <icon>https://kioipp.com/favicon.ico</icon>
     <rights>All rights reserved 2021, 自留地</rights>
+    <entry>
+        <title type="html"><![CDATA[浅谈 Ansible Playbook 任务执行顺序组织]]></title>
+        <id>https://kioipp.com/post/du-dong-ansible-playbook-ren-wu-zhi-xing-shun-xu/</id>
+        <link href="https://kioipp.com/post/du-dong-ansible-playbook-ren-wu-zhi-xing-shun-xu/">
+        </link>
+        <updated>2021-03-29T06:32:57.000Z</updated>
+        <content type="html"><![CDATA[<p>根据 strategy 和 serial 及 forks 数测试 Playbook 实际执行顺序。</p>
+<h1 id="基本概念">基本概念</h1>
+<p>官方文档参考：</p>
+<blockquote>
+<p>https://docs.ansible.com/ansible/latest/user_guide/playbooks_strategies.html</p>
+</blockquote>
+<h2 id="strategy">strategy</h2>
+<p>单个 play 级的调度策略，定义执行实例是否有步骤锁，即单个 task 是否等待其他实例执行完成。具体有两种方式：</p>
+<ul>
+<li>linear</li>
+</ul>
+<blockquote>
+<p>Task execution is in lockstep per host batch as defined by serial (default all). Up to the fork limit of hosts will execute each task at the same time and then the next series of hosts until the batch is done, before going on to the next task.</p>
+</blockquote>
+<p>默认值。在一个实例分组(serial)内，开始执行下一个任务需要等待<code>所有</code>实例上一个任务执行完成。</p>
+<ul>
+<li>free</li>
+</ul>
+<blockquote>
+<p>Task execution is as fast as possible per batch as defined by serial (default all). Ansible will not wait for other hosts to finish the current task before queuing more tasks for other hosts. All hosts are still attempted for the current task, but it prevents blocking new tasks for hosts that have already finished.<br>
+With the free strategy, unlike the default linear strategy, a host that is slow or stuck on a specific task won’t hold up the rest of the hosts and tasks.</p>
+</blockquote>
+<p>非默认值。在一个实例分组(serial)内，开始执行下一个任务需要两个条件：</p>
+<ul>
+<li><code>本实例</code>上一个任务执行完成，</li>
+<li>下一个任务的并发数(forks)有冗余。</li>
+</ul>
+<h2 id="forks">forks</h2>
+<blockquote>
+<p>Maximum number of simultaneous connections Ansible made on each Task.</p>
+</blockquote>
+<p>并发数。在单个分组和单个任务中，同时执行任务的最大实例数。</p>
+<h2 id="serial">serial</h2>
+<p>默认值为 <code>all</code> 。定义单轮执行实例的数量。当一轮实例<code>全部</code>执行完成后，下一轮的实例才会执行。</p>
+<h1 id="举例说明">举例说明</h1>
+<p>定义5个实例数和2个任务，每个任务耗时5s:</p>
+<ul>
+<li>Node: C1\C2\C3\C4\C5</li>
+<li>Task:T1(5s), T2(5s)</li>
+</ul>
+<p>先看看不同 <code>strategy</code> 场景：</p>
+<p><em><strong>场景1</strong>：strategy=linear, forks=5, (serial=all)</em></p>
+<p>T1: C1-C2-C3-C4-C5 （5s）<br>
+T2: C1-C2-C3-C4-C5 （5s）</p>
+<p>总耗时 <code>10s</code></p>
+<p><em><strong>场景2</strong>: strategy=free, forks=5, (serial=all)</em></p>
+<p>C1: T1-&gt;T2, 同时 C2: T1-&gt; T2，同时 C3: T1-&gt;T2，同时 C4: T1-&gt;T2，同时 C5：T1-&gt;T2</p>
+<p>总耗时 <code>10s</code></p>
+<p>在这个基础上修改 <code>forks</code> 数量，再看看不同 <code>strategy</code> 场景</p>
+<p><em><strong>场景3</strong>：strategy=linear, forks=3, (serial=all)</em></p>
+<p>C1: T1-&gt;T2, 同时 C2: T1-&gt; T2，同时 C3: T1-&gt;T2<br>
+C4: T1-&gt;T2，同时 C5：T1-&gt;T2</p>
+<p>总耗时 <code>20s</code></p>
+<p><em><strong>场景4</strong>：strategy=free, forks=3, (serial=all)</em></p>
+<p>T1: C1-C2-C3 （5s）<br>
+T1: C4-C5 （5s）<br>
+T2: C1-C2-C3 （5s）<br>
+T2: C4-C5 （5s）</p>
+<p>和场景3一样：<code>20s</code><br>
+场景4和场景3表现一致：虽然单个实例之间互相无关联，但 C1-C2-C3 执行完 T1 前，T1最大 forks 为3，C4和C5需要等当前 T1 forks 有冗余时才能继续执行。</p>
+<p>在 forks 为5时，修改 serial 的值：</p>
+<p><em><strong>场景5</strong>：strategy=linear, forks=5, serial=3</em></p>
+<p>T1: C1-C2-C3 （5s）<br>
+T2: C1-C2-C3 （5s）<br>
+T1: C4-C5 （5s）<br>
+T2: C4-C5 （5s）</p>
+<p>总耗时 <code>20s</code></p>
+<p><em><strong>场景6</strong>：strategy=free, forks=5, serial=3</em></p>
+<p>T1: C1-C2-C3 （5s）<br>
+T2: C1-C2-C3 （5s）<br>
+T1: C4-C5 （5s）<br>
+T2: C4-C5 （5s）</p>
+<p>总耗时 <code>20s</code></p>
+<p>当 forks=3，serial=3 时：</p>
+<p><em><strong>场景7</strong>：strategy=linear, forks=3, serial=3</em></p>
+<p>和场景5一致。</p>
+<p><em><strong>场景8</strong>：strategy=free, forks=3, serial=3</em></p>
+<p>和场景6一致。</p>
+<p>当 forks 小于 serial 时：</p>
+<p><em><strong>场景9</strong>：strategy=linear, forks=2, serial=3</em></p>
+<p>T1: C1-C2 (5s)<br>
+T1: C3 （5s）<br>
+T2: C1-C2 （5s）<br>
+T2: C3 （5s）<br>
+T1: C4-C5 (5s)<br>
+T2: C4-C5 (5s)</p>
+<p>总耗时 <code>30s</code></p>
+<p><em><strong>场景10</strong>：strategy=free, forks=2, serial=3</em></p>
+<p>T1: C1-C2 (5s)<br>
+T2: C1-C2  (5s)<br>
+T1: C3 （5s）<br>
+T2: C3 （5s）<br>
+T1: C4-C5 (5s)<br>
+T2: C4-C5 (5s)</p>
+<p>总耗时 <code>30s</code></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[2020.12.31]]></title>
         <id>https://kioipp.com/post/20201231/</id>
@@ -680,138 +783,6 @@ def echo_with_args(name, pid=False):
 <pre><code class="language-bash">$ python3 cli_sample.py echo.echo_with_args batman --p
 Name is batman, PID exists
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[SFM(状态机)轮子：transitions 学习]]></title>
-        <id>https://kioipp.com/post/python-sfmzhuang-tai-ji-lun-zi-transitions-xue-xi/</id>
-        <link href="https://kioipp.com/post/python-sfmzhuang-tai-ji-lun-zi-transitions-xue-xi/">
-        </link>
-        <updated>2020-10-15T07:43:20.000Z</updated>
-        <content type="html"><![CDATA[<p>从同事写的一个工具里发现了这个库，能适用很多需要状态管理的场景，作者写的 Code Samples 更有意思。特此记录并写下学习这个库时候的心得。</p>
-<h2 id="蝙蝠侠快速示范">蝙蝠侠快速示范</h2>
-<pre><code class="language-python">from transitions import Machine
-import random
-
-class NarcolepticSuperhero(object):
-
-    # Define some states. Most of the time, narcoleptic superheroes are just like
-    # everyone else. Except for...
-    &quot;&quot;&quot;定义一个超级英雄的日常行为状态
-    &quot;&quot;&quot;
-    states = ['asleep', 'hanging out', 'hungry', 'sweaty', 'saving the world']
-
-    def __init__(self, name):
-
-        # No anonymous superheroes on my watch! Every narcoleptic superhero gets
-        # a name. Any name at all. SleepyMan. SlumberGirl. You get the idea.
-        ## 哪怕是叫小强，超级英雄也是需要一个响亮的名字
-        self.name = name
-
-        # What have we accomplished today?
-        ## 超级英雄日常拯救小猫任务计数 0/999999
-        self.kittens_rescued = 0
-
-        # Initialize the state machine
-        ## 超级英雄的一天从睡觉开始（雾
-        self.machine = Machine(model=self, states=NarcolepticSuperhero.states, initial='asleep')
-
-        # Add some transitions. We could also define these using a static list of
-        # dictionaries, as we did with states above, and then pass the list to
-        # the Machine initializer as the transitions= argument.
-
-        ## 给超级英雄添加一系列任务，这样就能让超级英雄从起床刷牙到拯救地球了
-        # At some point, every superhero must rise and shine.
-        self.machine.add_transition(trigger='wake_up', source='asleep', dest='hanging out')
-
-        # Superheroes need to keep in shape.
-        self.machine.add_transition('work_out', 'hanging out', 'hungry')
-
-        # Those calories won't replenish themselves!
-        self.machine.add_transition('eat', 'hungry', 'hanging out')
-
-        # Superheroes are always on call. ALWAYS. But they're not always
-        # dressed in work-appropriate clothing.
-
-        ## 超级英雄可以从任何时候进行拯救世界状态，但需要先穿上赞助商定制战衣～
-        self.machine.add_transition('distress_call', '*', 'saving the world',
-                         before='change_into_super_secret_costume')
-
-        # When they get off work, they're all sweaty and disgusting. But before
-        # they do anything else, they have to meticulously log their latest
-        # escapades. Because the legal department says so.
-        ## 在完成任务后，主机会自动给超级英雄记上一笔小红花
-        self.machine.add_transition('complete_mission', 'saving the world', 'sweaty',
-                         after='update_journal')
-
-        # Sweat is a disorder that can be remedied with water.
-        # Unless you've had a particularly long day, in which case... bed time!
-        ## 入睡前必须洗澡，除非超级英雄今天压根就没出门……（即使这样也要洗澡的吧喂！难道超级英雄是北方人吗？
-        self.machine.add_transition('clean_up', 'sweaty', 'asleep', conditions=['is_exhausted'])
-        self.machine.add_transition('clean_up', 'sweaty', 'hanging out')
-
-        # Our NarcolepticSuperhero can fall asleep at pretty much any time.
-        ## 没错！超级英雄任何时候都能入睡！
-        self.machine.add_transition('nap', '*', 'asleep')
-
-    def update_journal(self):
-        &quot;&quot;&quot; Dear Diary, today I saved Mr. Whiskers. Again. &quot;&quot;&quot;
-        self.kittens_rescued += 1
-
-    @property
-    def is_exhausted(self):
-        &quot;&quot;&quot; Basically a coin toss. &quot;&quot;&quot;
-        return random.random() &lt; 0.5
-
-    def change_into_super_secret_costume(self):
-        print(&quot;Beauty, eh?&quot;)
-
-</code></pre>
-<p>下面我们有请蝙蝠侠进行超级英雄示范 👏</p>
-<pre><code class="language-bash">&gt;&gt;&gt; batman = NarcolepticSuperhero(&quot;Batman&quot;)
-&gt;&gt;&gt; batman.state
-'asleep'
-
-&gt;&gt;&gt; batman.wake_up()
-&gt;&gt;&gt; batman.state
-'hanging out'
-
-&gt;&gt;&gt; batman.nap()
-&gt;&gt;&gt; batman.state
-'asleep'
-
-&gt;&gt;&gt; batman.clean_up()
-MachineError: &quot;Can't trigger event clean_up from state asleep!&quot;
-
-&gt;&gt;&gt; batman.wake_up()
-&gt;&gt;&gt; batman.work_out()
-&gt;&gt;&gt; batman.state
-'hungry'
-
-# Batman still hasn't done anything useful...
-&gt;&gt;&gt; batman.kittens_rescued
-0
-
-# We now take you live to the scene of a horrific kitten entreement...
-&gt;&gt;&gt; batman.distress_call()
-'Beauty, eh?'
-&gt;&gt;&gt; batman.state
-'saving the world'
-
-# Back to the crib.
-&gt;&gt;&gt; batman.complete_mission()
-&gt;&gt;&gt; batman.state
-'sweaty'
-
-&gt;&gt;&gt; batman.clean_up()
-&gt;&gt;&gt; batman.state
-'asleep'   # Too tired to shower!
-
-# Another productive day, Alfred.
-&gt;&gt;&gt; batman.kittens_rescued
-1
-</code></pre>
-<p>TOBE Continued .</p>
 ]]></content>
     </entry>
 </feed>
